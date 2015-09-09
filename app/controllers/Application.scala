@@ -12,7 +12,6 @@ object Application extends Controller {
     Ok(views.html.index())
   }
 
-  //TODO: possible to add as extension?
   def addScimVersion(obj: JsValue): JsObject = {
     return Json.obj("schemas" -> Json.arr(JsString("urn:scim:schemas:core:1.0"))).
       as[JsObject].deepMerge(obj.as[JsObject])
@@ -38,7 +37,7 @@ object Application extends Controller {
         User.create(userName, displayName) match {
           case Some(id) =>
             User.get(id) match {
-              case user: User => Created(Json.toJson(user))
+              case user: User => Created(addScimVersion(Json.toJson(user)))
               case _ => NotFound("Error: Unable to get created resource")
             }
           case None =>
@@ -55,7 +54,7 @@ object Application extends Controller {
       case (userName, displayName) => {
         if (User.update(id, userName, displayName)) {
           User.get(id) match {
-            case user: User => Ok(Json.toJson(user)) //TODO: Add schema
+            case user: User => Ok(addScimVersion(Json.toJson(user)))
             case _ => NotFound("Error: Unable to get updated resource")
           }
         }
