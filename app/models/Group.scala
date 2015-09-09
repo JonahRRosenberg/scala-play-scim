@@ -7,7 +7,7 @@ import play.api.db.DB
 import play.api.Play.current
 
 case class Group(id: String, meta: Meta, displayName: String, members: List[UserRef])
-case class UserRef(value: String)
+case class UserRef(value: String, displayName: String)
 
 object Group {
   def getAll: List[Group] = {
@@ -16,9 +16,15 @@ object Group {
 
       rows.map(row => {
         val groupId = row[Long]("id")
-        val users = SQL("SELECT * FROM users_groups_mapping WHERE groupid={groupid}").on(
+        val users = SQL(
+          """SELECT map.userid, u.displayName
+             FROM users_groups_mapping map
+             JOIN users u on u.id = map.userid
+             WHERE groupid={groupid}""").on(
           'groupid -> groupId
-        ).apply().map(row => UserRef(row[Long]("userid").toString)).toList
+        ).apply().map(row => UserRef(
+          row[Long]("userid").toString,
+          row[String]("displayName"))).toList
         Group(groupId.toString, MetaObj.apply(row), row[String]("displayName"), users)
       }).toList
     }
