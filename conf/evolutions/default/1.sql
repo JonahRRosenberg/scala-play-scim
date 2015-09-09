@@ -18,8 +18,16 @@ CREATE TABLE groups(
   displayName VARCHAR(255) NOT NULL,
   created DATETIME NOT NULL,
   lastModified DATETIME NOT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY displayName (displayName)
 );
+
+CREATE TABLE users_groups_mapping(
+  userid BIGINT(20) NOT NULL,
+  groupid BIGINT(20) NOT NULL,
+  FOREIGN KEY(userid) REFERENCES users(ID),
+  FOREIGN KEY(groupid) REFERENCES groups(ID)
+)
 
 # --- !Downs
 

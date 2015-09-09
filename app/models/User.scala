@@ -3,8 +3,6 @@ package models
 import java.sql.SQLException
 
 import anorm._
-import org.joda.time.DateTime
-import org.joda.time.format.ISODateTimeFormat
 import play.api.db.DB
 import play.api.Play.current
 

@@ -67,13 +67,46 @@ object Application extends Controller {
     }
   }
 
-  implicit val rds = (
+  def getGroups() = Action {
+    val groups = Group.getAll
+    Ok(addScimVersion(Json.obj(
+      "totalResults" -> groups.length,
+      "Resources" -> groups)))
+  }
+
+  def newGroup = Action(parse.json) { request =>
+    request.body.validate[(String)].map{
+      case (displayName) => {
+        Group.create(displayName) match {
+          case Some(id) =>
+            Group.get(id) match {
+              case group: Group => Created(addScimVersion(Json.toJson(group)))
+              case _ => NotFound("Error: Unable to get created resource")
+            }
+          case None =>
+            Conflict("Duplicate displayName")
+        }
+      }
+    }.recoverTotal {
+      e => BadRequest("Detected error: " + JsError.toFlatJson(e))
+    }
+  }
+
+  implicit val jsonReadsUser = (
     (__ \ 'userName).read[String] and
       (__ \ 'displayName).read[String]
     ) tupled
+
+  implicit val jsonReadsGroup = (
+      (__ \ 'displayName).read[String]
+    )
 
   implicit val metaReads = Json.reads[Meta]
   implicit val metaWrites = Json.writes[Meta]
   implicit val userReads = Json.reads[User]
   implicit val userWrites = Json.writes[User]
+  implicit val userRefReads = Json.reads[UserRef]
+  implicit val userRefWrites = Json.writes[UserRef]
+  implicit val groupReads = Json.reads[Group]
+  implicit val groupWrites = Json.writes[Group]
 }
