@@ -28,6 +28,14 @@ object User {
     }
   }
 
+  def delete(id: Long): Boolean = {
+    DB.withConnection { implicit c =>
+      SQL("DELETE FROM users WHERE id={id}").on(
+        'id -> id
+      ).executeUpdate() > 0
+    }
+  }
+
   def create(userName: String, displayName: String): Option[Long] = {
     DB.withConnection { implicit c =>
       SQL(

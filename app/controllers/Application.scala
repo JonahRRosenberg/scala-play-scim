@@ -12,19 +12,24 @@ object Application extends Controller {
     Ok(views.html.index())
   }
 
-  //TODO: Add to helper class?
+  //TODO: possible to add as extension?
   def addScimVersion(obj: JsValue): JsObject = {
     return Json.obj("schemas" -> Json.arr(JsString("urn:scim:schemas:core:1.0"))).
       as[JsObject].deepMerge(obj.as[JsObject])
   }
 
-  //"schemas": ["urn:scim:schemas:core:1.0"],
-
   def getUser(id: Long) = Action {
     User.get(id) match {
       case user: User => Ok(addScimVersion(Json.toJson(user)))
-      case _ => NotFound("Resource " + id + " not found")
+      case _ => NotFound("Resource " + id + " not found.")
     }
+  }
+
+  def deleteUser(id: Long) = Action {
+    if (User.delete(id))
+      Ok("")
+    else
+      NotFound("Resource " + id + " not found.")
   }
 
   def newUser = Action(parse.json) { request =>
