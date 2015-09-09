@@ -1,5 +1,7 @@
 package models
 
+import java.sql.SQLException
+
 import anorm._
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -38,13 +40,20 @@ object User {
 
   def create(userName: String, displayName: String): Option[Long] = {
     DB.withConnection { implicit c =>
-      SQL(
-        """INSERT INTO users (userName, displayName, created, lastModified)
-           VALUES ({userName}, {displayName}, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP())
-        """).on(
-        'userName -> userName,
-        'displayName -> displayName
-      ).executeInsert().map(id => id)
+      try {
+        SQL(
+          """INSERT INTO users (userName, displayName, created, lastModified)
+             VALUES ({userName}, {displayName}, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP())
+          """).on(
+            'userName -> userName,
+            'displayName -> displayName
+          ).executeInsert().map(id => id)
+      } catch {
+        // This exception handling would need to be more robust
+        case e: SQLException =>
+          println("SqlException: " + e.getStackTrace)
+          None
+      }
     }
   }
 

@@ -9,7 +9,8 @@ CREATE TABLE users(
   displayName VARCHAR(255) NOT NULL,
   created DATETIME NOT NULL,
   lastModified DATETIME NOT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY userName (userName)
 );
 
 CREATE TABLE groups(
