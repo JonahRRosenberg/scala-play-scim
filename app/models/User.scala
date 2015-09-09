@@ -9,6 +9,17 @@ import play.api.Play.current
 case class User(id: String, meta: Meta, userName: String, displayName: String)
 
 object User {
+  def getAll: List[User] = {
+    DB.withConnection { implicit c =>
+      SQL("SELECT * FROM users").apply().map(
+        row => User(
+          row[Int]("id").toString(),
+          MetaObj.apply(row),
+          row[String]("userName"),
+          row[String]("displayName"))).toList
+    }
+  }
+
   def get(id: Long): User = {
     DB.withConnection { implicit c =>
       val rows = SQL("SELECT * FROM users WHERE id={id}").on(

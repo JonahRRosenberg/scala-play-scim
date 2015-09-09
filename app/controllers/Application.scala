@@ -17,6 +17,13 @@ object Application extends Controller {
       as[JsObject].deepMerge(obj.as[JsObject])
   }
 
+  def getUsers() = Action {
+    val users = User.getAll
+    Ok(addScimVersion(Json.obj(
+      "totalResults" -> users.length,
+      "Resources" -> users)))
+  }
+
   def getUser(id: Long) = Action {
     User.get(id) match {
       case user: User => Ok(addScimVersion(Json.toJson(user)))
