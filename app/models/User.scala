@@ -9,9 +9,12 @@ import play.api.Play.current
 case class User(id: String, meta: Meta, userName: String, displayName: String)
 
 object User {
-  def getAll: List[User] = {
+  def getAll(filter: String): List[User] = {
+    val filterQuery = getFilterQuery(filter)
+    println("filterQuery: " + filterQuery)
+
     DB.withConnection { implicit c =>
-      SQL("SELECT * FROM users").apply().map(
+      SQL("SELECT * FROM users" + filterQuery).apply().map(
         row => User(
           row[Int]("id").toString(),
           MetaObj.apply(row),
@@ -79,6 +82,14 @@ object User {
           'displayName -> displayName,
           'id -> id
         ).executeUpdate() > 0
+    }
+  }
+
+  def getFilterQuery(filter: String): String = {
+    val eqPattern = "([a-zA-Z0-9]+) [eE][qQ] \"(.*)\"".r
+    filter match {
+      case eqPattern(field, value) => " WHERE %s='%s'".format(field, value)
+      case _ => ""
     }
   }
 }
