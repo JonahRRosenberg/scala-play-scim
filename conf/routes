@@ -2,18 +2,17 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET           /                    controllers.Application.index
+# Home page - no need for now
+#GET           /                    controllers.Application.index
 
-# TODO: Add /scim/v1/...
-GET           /users               controllers.Application.getUsers(filter: String ?= "")
-GET           /users/:id           controllers.Application.getUser(id: Long)
-DELETE        /users/:id           controllers.Application.deleteUser(id: Long)
-PUT           /users/:id           controllers.Application.updateUser(id: Long)
-POST          /users               controllers.Application.newUser
+GET           /scim/v1/users               controllers.Application.getUsers(filter: String ?= "")
+GET           /scim/v1/users/:id           controllers.Application.getUser(id: Long)
+DELETE        /scim/v1/users/:id           controllers.Application.deleteUser(id: Long)
+PUT           /scim/v1/users/:id           controllers.Application.updateUser(id: Long)
+POST          /scim/v1/users               controllers.Application.newUser
 
-GET           /groups              controllers.Application.getGroups
-POST          /groups              controllers.Application.newGroup
+GET           /scim/v1/groups              controllers.Application.getGroups
+POST          /scim/v1/groups              controllers.Application.newGroup
 
 # Map static resources from the /public folder to the /assets URL path
 GET           /assets/*file        controllers.Assets.at(path="/public", file)
