@@ -47,4 +47,20 @@ object User {
       ).executeInsert().map(id => id)
     }
   }
+
+  def update(id: Long, userName: String, displayName: String): Boolean = {
+    DB.withConnection { implicit c =>
+      SQL(
+        """UPDATE users SET
+           userName={userName},
+           displayName={displayName},
+           lastModified=CURRENT_TIMESTAMP
+           WHERE id={id}
+        """).on(
+          'userName -> userName,
+          'displayName -> displayName,
+          'id -> id
+        ).executeUpdate() > 0
+    }
+  }
 }

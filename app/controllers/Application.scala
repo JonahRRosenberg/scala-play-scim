@@ -44,10 +44,24 @@ object Application extends Controller {
           case None =>
             Conflict("Duplicate username")
         }
-//        val user = getUser(createdId)
-//        Created(JsObject(Seq(
-//          "userName" -> JsString(userName)
-//        )))
+      }
+    }.recoverTotal {
+      e => BadRequest("Detected error: " + JsError.toFlatJson(e))
+    }
+  }
+
+  def updateUser(id: Long) = Action(parse.json) { request =>
+    request.body.validate[(String, String)].map{
+      case (userName, displayName) => {
+        if (User.update(id, userName, displayName)) {
+          User.get(id) match {
+            case user: User => Ok(Json.toJson(user)) //TODO: Add schema
+            case _ => NotFound("Error: Unable to get updated resource")
+          }
+        }
+        else {
+          Conflict("Unable to update resource with id: " + id)
+        }
       }
     }.recoverTotal {
       e => BadRequest("Detected error: " + JsError.toFlatJson(e))
